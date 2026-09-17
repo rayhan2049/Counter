@@ -1,60 +1,407 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Survey Response Counter</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Survey Dashboard</title>
 
     <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
+            margin: 0;
+            min-height: 100vh;
+
             font-family: Arial, sans-serif;
+
+            background: #111827;
+            color: white;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+
+        .dashboard {
+            width: 90%;
+            max-width: 700px;
+
+            background: #1f2937;
+
+            padding: 40px;
+
+            border-radius: 20px;
+
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+
             text-align: center;
-            margin-top: 100px;
         }
 
-        #counter {
-            font-size: 80px;
+
+        .title {
+            font-size: 18px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+
+            color: #9ca3af;
+
+            margin-bottom: 30px;
+        }
+
+
+        .counter {
+            font-size: 110px;
             font-weight: bold;
+
+            line-height: 1;
+
+            margin-bottom: 10px;
         }
 
-        #status {
-            color: gray;
+
+        .counter-label {
+            font-size: 20px;
+            color: #d1d5db;
+
+            margin-bottom: 35px;
         }
+
+
+        .progress-container {
+            width: 100%;
+            height: 20px;
+
+            background: #374151;
+
+            border-radius: 20px;
+
+            overflow: hidden;
+
+            margin-bottom: 15px;
+        }
+
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+
+            background: #60a5fa;
+
+            border-radius: 20px;
+
+            transition: width 1s ease;
+        }
+
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+
+            color: #9ca3af;
+
+            font-size: 14px;
+
+            margin-bottom: 35px;
+        }
+
+
+        .percentage {
+            font-size: 30px;
+            font-weight: bold;
+
+            margin-bottom: 30px;
+        }
+
+
+        .status {
+            font-size: 14px;
+
+            color: #9ca3af;
+        }
+
+
+        .live {
+            display: inline-flex;
+            align-items: center;
+
+            gap: 8px;
+
+            margin-bottom: 10px;
+        }
+
+
+        .dot {
+            width: 10px;
+            height: 10px;
+
+            background: #22c55e;
+
+            border-radius: 50%;
+
+            animation: pulse 2s infinite;
+        }
+
+
+        @keyframes pulse {
+
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+
+            100% {
+                opacity: 1;
+            }
+
+        }
+
+
+        .updated {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+
+        /* Animation when the count increases */
+
+        .count-up {
+            animation: countAnimation 0.6s ease;
+        }
+
+
+        @keyframes countAnimation {
+
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.15);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .dashboard {
+                padding: 30px 20px;
+            }
+
+            .counter {
+                font-size: 80px;
+            }
+
+        }
+
     </style>
+
 </head>
+
 
 <body>
 
-    <h1>Survey Responses</h1>
 
-    <div id="counter">Loading...</div>
+    <div class="dashboard">
 
-    <p>responses collected</p>
+        <div class="title">
+            Survey Response Dashboard
+        </div>
 
-    <p id="status">Updating...</p>
+
+        <div id="counter" class="counter">
+            --
+        </div>
+
+
+        <div class="counter-label">
+            responses collected
+        </div>
+
+
+        <div class="progress-container">
+
+            <div
+                id="progressBar"
+                class="progress-bar">
+            </div>
+
+        </div>
+
+
+        <div class="progress-text">
+
+            <span>0</span>
+
+            <span>Target: 100</span>
+
+        </div>
+
+
+        <div
+            id="percentage"
+            class="percentage">
+            0%
+        </div>
+
+
+        <div class="status">
+
+            <div class="live">
+
+                <div class="dot"></div>
+
+                LIVE
+
+            </div>
+
+
+            <div id="updated" class="updated">
+                Updating...
+            </div>
+
+        </div>
+
+    </div>
+
+
 
     <script>
-        const API_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=AUkAhnQxuBalMSyGE5q1UqTGyuX7ZrzjKrxnpTZ8J1KDabcpoMxNtHp0Ifq9mBAmpGj8StyFBrKpfSFmqMyq05MyOmNPyRhSO0mae6Er_6DGwmXsi3GtstaPGklkOUR2NlszZpFWTm-XmKUIedE1Hbim-Ppq1XiprU6GSBFZ_MhBJPO0SmdRcuh06LUAr3ouXeLinCb6RMgOf-ZFWRahswxq5d32M_STt5SuLPfq0SOA_MDT9l_lxk24FYSMJK_qTTZ9AbacrdwbPJsZhXoPc544AUPWIzK4CA&lib=MwPN-Sa7zl_HyCBIx1hQoyp4TUwLxVb_A";
 
-        async function updateCounter() {
+        const API_URL =
+            "https://script.googleusercontent.com/macros/echo?user_content_key=AUkAhnQxuBalMSyGE5q1UqTGyuX7ZrzjKrxnpTZ8J1KDabcpoMxNtHp0Ifq9mBAmpGj8StyFBrKpfSFmqMyq05MyOmNPyRhSO0mae6Er_6DGwmXsi3GtstaPGklkOUR2NlszZpFWTm-XmKUIedE1Hbim-Ppq1XiprU6GSBFZ_MhBJPO0SmdRcuh06LUAr3ouXeLinCb6RMgOf-ZFWRahswxq5d32M_STt5SuLPfq0SOA_MDT9l_lxk24FYSMJK_qTTZ9AbacrdwbPJsZhXoPc544AUPWIzK4CA&lib=MwPN-Sa7zl_HyCBIx1hQoyp4TUwLxVb_A";
+
+
+        const TARGET = 100;
+
+
+        let previousCount = null;
+
+
+
+        async function updateDashboard() {
+
             try {
-                const response = await fetch(API_URL);
-                const data = await response.json();
 
-                document.getElementById("counter").textContent =
-                    data.responses;
+                const response =
+                    await fetch(API_URL);
 
-                document.getElementById("status").textContent =
-                    "Last updated: " + new Date().toLocaleTimeString();
+
+                const data =
+                    await response.json();
+
+
+                const count =
+                    Number(data.responses);
+
+
+                const percentage =
+                    Math.min((count / TARGET) * 100, 100);
+
+
+                const counter =
+                    document.getElementById("counter");
+
+
+                const progressBar =
+                    document.getElementById("progressBar");
+
+
+                const percentageElement =
+                    document.getElementById("percentage");
+
+
+                const updated =
+                    document.getElementById("updated");
+
+
+                /*
+                 * Animate the counter when
+                 * a new response arrives.
+                 */
+
+                if (
+                    previousCount !== null &&
+                    count > previousCount
+                ) {
+
+                    counter.classList.remove("count-up");
+
+                    /*
+                     * Force browser to restart
+                     * the animation.
+                     */
+
+                    void counter.offsetWidth;
+
+                    counter.classList.add("count-up");
+
+                }
+
+
+                counter.textContent = count;
+
+
+                progressBar.style.width =
+                    percentage + "%";
+
+
+                percentageElement.textContent =
+                    Math.round(percentage) + "%";
+
+
+                updated.textContent =
+                    "Last updated: " +
+                    new Date().toLocaleTimeString();
+
+
+                previousCount = count;
+
 
             } catch (error) {
-                document.getElementById("status").textContent =
-                    "Unable to update counter";
+
+                document.getElementById("updated").textContent =
+                    "Unable to connect to response server";
+
             }
+
         }
 
-        updateCounter();
 
-        setInterval(updateCounter, 10000);
+
+        /*
+         * Load immediately
+         */
+
+        updateDashboard();
+
+
+        /*
+         * Check for new responses
+         * every 10 seconds.
+         */
+
+        setInterval(
+            updateDashboard,
+            10000
+        );
+
     </script>
 
+
 </body>
+
 </html>
