@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Survey Response Counter</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 100px;
+        }
+
+        #counter {
+            font-size: 80px;
+            font-weight: bold;
+        }
+
+        #status {
+            color: gray;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Survey Responses</h1>
+
+    <div id="counter">Loading...</div>
+
+    <p>responses collected</p>
+
+    <p id="status">Updating...</p>
+
+    <script>
+        const API_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=AUkAhnQxuBalMSyGE5q1UqTGyuX7ZrzjKrxnpTZ8J1KDabcpoMxNtHp0Ifq9mBAmpGj8StyFBrKpfSFmqMyq05MyOmNPyRhSO0mae6Er_6DGwmXsi3GtstaPGklkOUR2NlszZpFWTm-XmKUIedE1Hbim-Ppq1XiprU6GSBFZ_MhBJPO0SmdRcuh06LUAr3ouXeLinCb6RMgOf-ZFWRahswxq5d32M_STt5SuLPfq0SOA_MDT9l_lxk24FYSMJK_qTTZ9AbacrdwbPJsZhXoPc544AUPWIzK4CA&lib=MwPN-Sa7zl_HyCBIx1hQoyp4TUwLxVb_A";
+
+        async function updateCounter() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+
+                document.getElementById("counter").textContent =
+                    data.responses;
+
+                document.getElementById("status").textContent =
+                    "Last updated: " + new Date().toLocaleTimeString();
+
+            } catch (error) {
+                document.getElementById("status").textContent =
+                    "Unable to update counter";
+            }
+        }
+
+        updateCounter();
+
+        setInterval(updateCounter, 10000);
+    </script>
+
+</body>
+</html>
